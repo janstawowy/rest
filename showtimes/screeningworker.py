@@ -8,7 +8,7 @@ from django.views import View
 
 fake = Faker()
 class fake_screeningmaker(View):
-    def fake_date():
+    def fake_date(self):
         month=randrange(1,12)
         if month==2:
             day=randrange(1,28)
@@ -21,14 +21,18 @@ class fake_screeningmaker(View):
         answer= '2018-{}-{} {}:{}'.format(str(month), str(day), str(hour), minute)
         return answer
 
-
-    def fake_screening(randdate):
-        movies = Movie.objects.all()
-        movieslist = list(movies)
+    def randcinema(self):
         cinemas = Cinema.objects.all()
         cinemaslist=list(cinemas)
+        return choice(cinemaslist)
+    
+    def randmovie(self):
+        movies = Movie.objects.all()
+        movieslist = list(movies)
+        return choice(movieslist)
 
-        Screening.objects.create(cinema=choice(cinemaslist), movie=choice(movieslist), date=randdate)
+    def __init__(self):
+        Screening.objects.create(cinema=self.randcinema(), movie=self.randmovie(), date=self.fake_date())
 
         return None
 
@@ -38,6 +42,7 @@ class fake_screeningmaker(View):
 def populate_db():
 
     for i in range(0, 50):
-        fake_screeningmaker.fake_screening(fake_screeningmaker.fake_date())
+#        fake_screeningmaker.fake_screening(fake_screeningmaker.fake_date())
+        fake_screeningmaker()
 
 

@@ -42,7 +42,6 @@ class fake_screeningmaker(View):
 def populate_db():
 
     for i in range(0, 50):
-#        fake_screeningmaker.fake_screening(fake_screeningmaker.fake_date())
         fake_screeningmaker()
 
 

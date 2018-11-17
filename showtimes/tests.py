@@ -17,16 +17,10 @@ class CinemaTestCase(APITestCase):
             self._create_fake_cinema()
         for _ in range(10):
             self._create_fake_screening()
-
+#prepare random data for new cinema
     def _fake_cinema_data(self):
-        """Generate a dict of movie data
-        The format is compatible with serializers (`Person` relations
-        represented by names).
-        """
-        # kina = ("pod Baranami", "Duże", "Małe", "Max", "Czerwone", "Kameralne", "Multi", "Helios", "City", "Uciecha",
-        #         "Rodzinne", "Gloria", "Niebieskie", "jeden", "dwa", "trzy", "cztery")
+
         cinema_data = {
-#            "name": "Kino {}".format(choice(kina)),
             "name": "Kino {}".format(self.faker.name()),
             "city": self.faker.address(),
         }
@@ -34,10 +28,11 @@ class CinemaTestCase(APITestCase):
         print(cinema_data["name"])
         return cinema_data
     def _create_fake_cinema(self):
-        """Generate new fake movie and save to database."""
+        #Generate new fake cinema and save to database.
         cinema_data = self._fake_cinema_data()
         new_cinema = Cinema.objects.create(**cinema_data)
 
+#prepare random date in a form that will be easy to test
     def fake_date(self):
         month=randrange(1,12)
         if month==2:
@@ -60,16 +55,19 @@ class CinemaTestCase(APITestCase):
         answer= '2018-{}-{} {}:{}'.format(str(month), str(day), str(hour), minute)
         return answer
 
+#pick a random cinema form all cinemas
     def randcinema(self):
         cinemas = Cinema.objects.all()
         cinemaslist = list(cinemas)
         return choice(cinemaslist)
 
+#pick a random movie from all movies
     def randmovie(self):
         movies = Movie.objects.all()
         movieslist = list(movies)
         return choice(movieslist)
 
+#format date from database to easy for testing format
     def format_date(self, date):
         newstr=str(date)
         newstr=newstr.replace("T", " ")
@@ -77,9 +75,10 @@ class CinemaTestCase(APITestCase):
         return newstr
 
     def _create_fake_screening(self):
-        """Generate new fake movie and save to database."""
+        """Generate new fake screening and save to database."""
         new_screening = Screening.objects.create(date=self.fake_date(), cinema= self.randcinema(), movie=self.randmovie())
 
+#cinemas tests
     def test_post_cinema(self):
         cinemas_before = Cinema.objects.count()
         new_cinema = self._fake_cinema_data()
@@ -97,16 +96,19 @@ class CinemaTestCase(APITestCase):
         response = self.client.get("/cinemas/", {}, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Cinema.objects.count(), len(response.data))
+
     def test_get_cinema_detail(self):
         response = self.client.get("/cinemas/1/", {}, format='json')
         self.assertEqual(response.status_code, 200)
         for field in ["name", "city", "movies"]:
             self.assertIn(field, response.data)
+
     def test_delete_cinema(self):
         response = self.client.delete("/cinemas/1/", {}, format='json')
         self.assertEqual(response.status_code, 204)
         cinema_ids = [cinema.id for cinema in Cinema.objects.all()]
         self.assertNotIn(1, cinema_ids)
+
     def test_update_cinema(self):
         response = self.client.get("/cinemas/1/", {}, format='json')
         cinema_data = response.data
@@ -150,16 +152,19 @@ class CinemaTestCase(APITestCase):
         response = self.client.get("/screening/", {}, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Screening.objects.count(), len(response.data))
+
     def test_get_screening_detail(self):
         response = self.client.get("/screening/1/", {}, format='json')
         self.assertEqual(response.status_code, 200)
         for field in ["date", "cinema", "movie"]:
             self.assertIn(field, response.data)
+
     def test_delete_screening(self):
         response = self.client.delete("/screening/1/", {}, format='json')
         self.assertEqual(response.status_code, 204)
         screening_ids = [screening.id for screening in Screening.objects.all()]
         self.assertNotIn(1, screening_ids)
+
     def test_update_screening(self):
         response = self.client.get("/screening/1/", {}, format='json')
         screening_data = response.data
